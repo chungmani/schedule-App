@@ -19,5 +19,6 @@ public class ScheduleService {
     public CreateScheduleResponse createSchedule(CreateScheduleRequest request) {
         Schedule schedule = new Schedule(request.getTitle(), request.getContent(), request.getName(), request.getPassword());
         Schedule savedSchedule = scheduleRepository.save(schedule);
+        return new CreateScheduleResponse(savedSchedule.getId(), savedSchedule.getTitle(), savedSchedule.getContent());
     }
 }
