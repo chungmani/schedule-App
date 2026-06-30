@@ -62,5 +62,17 @@ public class ScheduleService {
         schedule.updateTitleName(request.getTitle(), request.getName());
         return new UpdateScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getName());
     }
+
+    public void delete(Long scheduleId, DeleteScheduleRequest request) {
+        Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
+                () -> new IllegalStateException("없는 일정입니다.")
+        );
+
+        if (!request.getPassword().equals(schedule.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 틀립니다.");
+        }
+
+        scheduleRepository.deleteById(scheduleId);
+    }
 }
 
