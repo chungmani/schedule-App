@@ -2,6 +2,7 @@ package com.example.schedule.service;
 
 import com.example.schedule.dto.CreateScheduleRequest;
 import com.example.schedule.dto.CreateScheduleResponse;
+import com.example.schedule.dto.GetScheduleResponse;
 import com.example.schedule.entity.Schedule;
 import com.example.schedule.repository.ScheduleRepository;
 import lombok.Getter;
@@ -21,4 +22,13 @@ public class ScheduleService {
         Schedule savedSchedule = scheduleRepository.save(schedule);
         return new CreateScheduleResponse(savedSchedule.getId(), savedSchedule.getTitle(), savedSchedule.getContent());
     }
+
+    @Transactional(readOnly = true)
+    public GetScheduleResponse findOne(Long scheduleId) {
+        Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
+                () -> new IllegalStateException("없는 일정입니다.")
+        );
+        return new GetScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getContent(), schedule.getName());
+    }
 }
+
