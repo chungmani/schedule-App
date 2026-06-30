@@ -1,8 +1,6 @@
 package com.example.schedule.service;
 
-import com.example.schedule.dto.CreateScheduleRequest;
-import com.example.schedule.dto.CreateScheduleResponse;
-import com.example.schedule.dto.GetScheduleResponse;
+import com.example.schedule.dto.*;
 import com.example.schedule.entity.Schedule;
 import com.example.schedule.repository.ScheduleRepository;
 import lombok.Getter;
@@ -54,6 +52,15 @@ public class ScheduleService {
         }
 
         return dtos;
+    }
+
+    @Transactional
+    public UpdateScheduleResponse update(Long scheduleId, UpdateScheduleRequest request) {
+        Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
+                () -> new IllegalStateException("없는 일정입니다.")
+        );
+        schedule.updateTitleName(request.getTitle(), request.getName());
+        return new UpdateScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getName());
     }
 }
 
