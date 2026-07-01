@@ -6,6 +6,6 @@ import lombok.Getter;
 public class UpdateScheduleRequest {
 
     private String title;
-    private String Name;
+    private String name;
     private String password;
 }

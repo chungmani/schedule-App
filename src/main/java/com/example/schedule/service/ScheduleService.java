@@ -3,7 +3,6 @@ package com.example.schedule.service;
 import com.example.schedule.dto.*;
 import com.example.schedule.entity.Schedule;
 import com.example.schedule.repository.ScheduleRepository;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -22,7 +21,7 @@ public class ScheduleService {
     public CreateScheduleResponse createSchedule(CreateScheduleRequest request) {
         Schedule schedule = new Schedule(request.getTitle(), request.getContent(), request.getName(), request.getPassword());
         Schedule savedSchedule = scheduleRepository.save(schedule);
-        return new CreateScheduleResponse(savedSchedule.getId(), savedSchedule.getTitle(), savedSchedule.getContent());
+        return new CreateScheduleResponse(savedSchedule.getId(), savedSchedule.getTitle(), savedSchedule.getContent(), savedSchedule.getName(), savedSchedule.getCreatedDate(), savedSchedule.getModifiedDate());
     }
 
     @Transactional(readOnly = true)
@@ -30,7 +29,7 @@ public class ScheduleService {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
                 () -> new IllegalStateException("없는 일정입니다.")
         );
-        return new GetScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getContent(), schedule.getName());
+        return new GetScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getContent(), schedule.getName(), schedule.getModifiedDate());
     }
 
     @Transactional(readOnly = true)
@@ -47,7 +46,7 @@ public class ScheduleService {
         }
 
         for (Schedule schedule : schedules) {
-            dto = new GetScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getContent(), schedule.getName());
+            dto = new GetScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getContent(), schedule.getName(), schedule.getModifiedDate());
             dtos.add(dto);
         }
 
@@ -59,10 +58,15 @@ public class ScheduleService {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
                 () -> new IllegalStateException("없는 일정입니다.")
         );
+
+        if (!request.getPassword().equals(schedule.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 틀립니다.");
+        }
         schedule.updateTitleName(request.getTitle(), request.getName());
-        return new UpdateScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getName());
+        return new UpdateScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getName(), schedule.getModifiedDate());
     }
 
+    @Transactional
     public void delete(Long scheduleId, DeleteScheduleRequest request) {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
                 () -> new IllegalStateException("없는 일정입니다.")
@@ -72,7 +76,7 @@ public class ScheduleService {
             throw new IllegalArgumentException("비밀번호가 틀립니다.");
         }
 
-        scheduleRepository.deleteById(scheduleId);
+        scheduleRepository.delete(schedule);
     }
 }
 
